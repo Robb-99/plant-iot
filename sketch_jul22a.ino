@@ -55,7 +55,7 @@ const int pilLEDPattern[28] =
  */
 void drawPIL()
 {
-  for(int i = 0; i < sizeof(pilLEDPattern) / sizeof(pilLEDPattern[0]); i++) leds[i] = CRGB(0, 255, 0);
+  for(int i = 0; i < sizeof(pilLEDPattern) / sizeof(pilLEDPattern[0]); i++) leds[pilLEDPattern[i]] = CRGB(0, 255, 0);
   
 }
 
