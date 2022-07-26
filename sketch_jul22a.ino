@@ -15,6 +15,49 @@ int ledPercentValue = 0;
 
 const int soilThreeshold = 25;
 
+/*
+ * Reprents led indices to draw the pil pattern
+ */
+const int pilLEDPattern[28] = 
+{
+  6,
+  9,
+  16,
+  17,
+  18,
+  19,
+  20,
+  21,
+  22,
+  32,
+  33,
+  34,
+  35,
+  36,
+  37,
+  38,
+  50,
+  60,
+  62,
+  64,
+  68,
+  73,
+  74,
+  75,
+  76,
+  77,
+  78,
+  79
+};
+
+/*
+ * Draws the PIL led pattern onto the matrix
+ */
+void drawPIL()
+{
+  for(int i = 0; i <= sizeof(pilLEDPattern) / sizeof(pilLEDPattern[0]); i++) leds[i] = CRGB(0, 255, 0);
+  
+}
 
 void alertSound(){
    playTone(freq[0], 150, 30);
