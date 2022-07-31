@@ -2,18 +2,25 @@
 
 #define IMDVerse
 
+const int SOIL_PIN = A0;
+
 #define PIN_SOUND 12
-int freq[4] = {440, 580, 650, 720};
+const int freq[4] = {440, 580, 650, 720};
 
 #define LED_PIN     7
 #define NUM_LEDS    80
 CRGB leds[NUM_LEDS];
 
-const int AirValue = 620;   //you need to replace this value with Value_1
-const int WaterValue = 310;  //you need to replace this value with Value_2
-int soilMoistureValue = 0;
-int soilmoisturepercent = 0;
-int ledPercentValue = 0;
+/*
+ * Soil measure config variables
+ */
+const int AirValue = 620;
+const int WaterValue = 310;
+
+/*
+ * Defines how much percent each led in the strip represents
+ */
+const float LED_PERCENT_VALUE = 100 / NUM_LEDS;
 
 const int soilUrgent = 10;
 const int soilDry = 20;
@@ -87,25 +94,18 @@ void playTone(int toneFrequency, int delayTime, int pauseTime)
 void setup() {
   Serial.begin(9600); // open serial port, set the baud rate to 9600 bps
   FastLED.addLeds<WS2812, LED_PIN, GRB>(leds, NUM_LEDS);
-  ledPercentValue = 100 / NUM_LEDS;
-  //Serial.println(ledPercentValue);
 }
 
 void loop() {
-  soilMoistureValue = analogRead(A0);  //put Sensor insert into soil
-  soilmoisturepercent = map(soilMoistureValue, AirValue, WaterValue, 0, 100);
-  //Serial.print(soilmoisturepercent);
-  //Serial.println("%");
+  const int soilmoisturepercent = map(analogRead(SOIL_PIN), AirValue, WaterValue, 0, 100);
   FastLED.clear(true);
   int ledsPercentActive = 0;
   //Zustände: Rot soilThreeshold <35, Grün  35-52, Blau >52
   if (soilmoisturepercent <= soilDry){
     for (int i = 0; i <= NUM_LEDS; i++) {
-      ledsPercentActive += ledPercentValue;
+      ledsPercentActive += LED_PERCENT_VALUE;
       leds[i] = CRGB(255,  0,   0); 
-      if(ledsPercentActive > soilmoisturepercent){
-        break;
-      }
+      if(ledsPercentActive > soilmoisturepercent) break;
     }
   }
   #ifdef IMDVerse
@@ -114,28 +114,21 @@ void loop() {
   #else
   else if (soilmoisturepercent > soilDry && soilmoisturepercent <= soilTooWet){
     for (int i = 0; i <= NUM_LEDS; i++) {
-      ledsPercentActive += ledPercentValue;
+      ledsPercentActive += LED_PERCENT_VALUE;
       leds[i] = CRGB(0,  255,   0); 
-      if(ledsPercentActive > soilmoisturepercent){
-        break;
-      }
+      if(ledsPercentActive > soilmoisturepercent) break;
     }
   }
   #endif
   else if (soilmoisturepercent > soilTooWet){
     for (int i = 0; i <= NUM_LEDS; i++) {
-      ledsPercentActive += ledPercentValue;
+      ledsPercentActive += LED_PERCENT_VALUE;
       leds[i] = CRGB(0,  0,   255); 
-      if(ledsPercentActive > soilmoisturepercent){
-        break;
-      }
+      if(ledsPercentActive > soilmoisturepercent) break;
     }
   }
-  //SSerial.println();
   FastLED.show();
-  if(soilmoisturepercent < soilUrgent){
- //Serial.println("Sound");
-    alertSound();
-  }
+  if(soilmoisturepercent < soilUrgent) alertSound();
+  
   delay(20000);
 }
